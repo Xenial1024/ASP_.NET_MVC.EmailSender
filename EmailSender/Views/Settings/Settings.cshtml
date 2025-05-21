@@ -1,0 +1,111 @@
+﻿<h1 id="title">Ustawienia</h1>
+@model EmailSender.Models.Domains.SenderSettings
+@{
+    ViewBag.Title = "Ustawienia";
+}
+@using (Html.BeginForm("SerializeSettings", "Settings", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+    <hr />
+    @Html.ValidationSummary(true, "")
+    <div class="form-group">
+        @Html.LabelFor(m => m.SenderEmail, new { @class = "control-label label-font-size" })
+        @Html.TextBoxFor(m => m.SenderEmail, new { @class = "form-control dark-input" })
+        @Html.ValidationMessageFor(m => m.SenderEmail)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.SenderEmailPassword, new { @class = "control-label label-font-size" })
+        @Html.PasswordFor(m => m.SenderEmailPassword, new { @class = "form-control dark-input" })
+        @Html.ValidationMessageFor(m => m.SenderEmailPassword)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.SenderName, new { @class = "control-label label-font-size" })
+        @Html.TextBoxFor(m => m.SenderName, new { @class = "form-control dark-input" })
+        @Html.ValidationMessageFor(m => m.SenderName)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.HostSmtp, new { @class = "control-label label-font-size" })
+        @Html.TextBoxFor(m => m.HostSmtp, new { @class = "form-control dark-input" })
+        @Html.ValidationMessageFor(m => m.HostSmtp)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Port, new { @class = "control-label label-font-size" })
+        @Html.TextBoxFor(m => m.Port, new { @class = "form-control dark-input" })
+        @Html.ValidationMessageFor(m => m.Port)
+    </div>
+    <br />
+    <div class="form-group">
+        <input type="submit" class="btn btn-success btn-lg" value="Zapisz" />
+    </div>
+}
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const email = document.getElementById('SenderEmail');
+            const hostSmtp = document.getElementById('HostSmtp');
+            const port = document.getElementById('Port');
+            const senderName = document.getElementById('SenderName');
+            const senderEmailPassword = document.getElementById('SenderEmailPassword');
+            if (email)
+                email.addEventListener('blur', function () {
+                    if (this.value.trim() === '') {
+                        this.setCustomValidity('Email nie może być pusty.');
+                        this.classList.add('input-validation-error');
+                    } else if (this.value.length > 254) {
+                        this.setCustomValidity('Adres email jest zbyt długi (maksymalnie 254 znaki).');
+                        this.classList.add('input-validation-error');
+                    } else if (!validator.isEmail(this.value)) {
+                        this.setCustomValidity('Adres email jest nieprawidłowy.');
+                        this.classList.add('input-validation-error');
+                    } else {
+                        this.setCustomValidity('');
+                        this.classList.remove('input-validation-error');
+                    }
+            });
+            if (hostSmtp)
+                hostSmtp.addEventListener('blur', function () {
+                    if (!hostPattern.test(this.value)) {
+                        this.setCustomValidity('Host SMTP ma nieprawidłowy format.');
+                        this.classList.add('input-validation-error');
+                    } else {
+                        this.setCustomValidity('');
+                        this.classList.remove('input-validation-error');
+                    }
+            });
+            if (port)
+                port.addEventListener('blur', function () {
+                    if (this.value > 65535 || this.value < 1) {
+                        this.setCustomValidity('Port jest nieprawidłowy.');
+                        this.classList.add('input-validation-error');
+                    } else if (!unsignedNumberRegex.test(this.value)) {
+                        this.setCustomValidity('Port musi być liczbą całkowitą.');
+                        this.classList.add('input-validation-error');
+                    } else {
+                        this.setCustomValidity('');
+                        this.classList.remove('input-validation-error');
+                    }
+            });
+            if (senderName)
+                senderName.addEventListener('blur', function () {
+                    if (this.value.trim() === '') {
+                        this.setCustomValidity('Nazwa nadawcy nie może być pusta.');
+                        this.classList.add('input-validation-error');
+                    } else {
+                        this.setCustomValidity('');
+                        this.classList.remove('input-validation-error');
+                    }
+            });
+            if (senderEmailPassword)
+                senderEmailPassword.addEventListener('blur', function () {
+                    if (this.value.trim() === '') {
+                        this.setCustomValidity('Hasło nie może być puste.');
+                        this.classList.add('input-validation-error');
+                    } else {
+                        this.setCustomValidity('');
+                        this.classList.remove('input-validation-error');
+                    }
+            });
+        });
+    </script>
+    <script src="~/Scripts/regexes.js"></script>
+}

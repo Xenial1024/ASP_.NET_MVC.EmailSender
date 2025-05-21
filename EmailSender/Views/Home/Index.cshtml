@@ -1,0 +1,57 @@
+﻿@{
+    ViewBag.HideMenu = true;
+}
+@{
+    ViewBag.Title = "Menu";
+}
+<div class="centered-content">
+    <img src="~/Content/Images/cannon.png"
+         style="height: 60vh"
+         alt="Armata strzelająca e-mailami" />
+
+    <button class="menu-button"
+            onclick='window.location.href="@Url.Action("Send", "Home")"'>
+        <img src="~/Content/Images/send.png" class="menu-button-image" />
+        WYSYŁANIE E-MAILA
+    </button>
+
+    <button class="menu-button"
+            onclick='window.location.href="@Url.Action("Settings", "Home")"'>
+        <img src="~/Content/Images/settings.png" class="menu-button-image" />
+        USTAWIENIA
+    </button>
+
+    <button class="menu-button"
+            onclick='window.location.href="@Url.Action("Archive", "Home")"'>
+        <img src="~/Content/Images/archive.png" class="menu-button-image" />
+        ARCHIWUM
+    </button>
+
+    <button class="menu-button"
+            onclick='window.location.href="@Url.Action("Info", "Home")"'>
+        <img src="~/Content/Images/info.png" class="menu-button-image" />
+        INFORMACJE
+    </button>
+</div>
+@if (TempData["Message"] != null)
+{
+    string alertClass = TempData["AlertType"] != null && TempData["AlertType"].ToString() == "error"
+        ? "centered-red-alert"
+        : "centered-green-alert";
+
+    <div class="@alertClass">
+        @TempData["Message"]
+    </div>
+}
+
+<script>
+    setTimeout(function () {
+        const msg = document.querySelector(".centered-red-alert, .centered-green-alert");
+        if (msg) {
+            msg.classList.add("hidden");
+            setTimeout(function () {
+                msg.remove();
+            }, 500);
+        }
+    }, 1700);
+</script>

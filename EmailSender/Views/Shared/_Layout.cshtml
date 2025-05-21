@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @RenderSection("Styles", required: false)
+
+</head>
+<body>
+    @if (ViewBag.HideMenu != true) //nie może być @if (!ViewBag.HideMenu), bo to nie obsłuży nulla
+    {
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
+            <div class="container">
+                <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="btn btn-dark mx-1 py-0">
+                            @Html.ActionLink("Menu", "Index", "Home", new { area = "" }, new { @class = "nav-link text-white menu-bar" })
+                        </li>
+                        <li class="btn btn-dark mx-1 py-0">
+                            @Html.ActionLink("Wysyłanie e-maila", "Send", "Home", new { area = "" }, new { @class = "nav-link text-white menu-bar" })
+                        </li>
+                        <li class="btn btn-dark mx-1 py-0">
+                            @Html.ActionLink("Ustawienia", "Settings", "Home", new { area = "" }, new { @class = "nav-link text-white menu-bar" })
+                        </li>
+                        <li class="btn btn-dark mx-1 py-0">
+                            @Html.ActionLink("Archiwum", "Archive", "Home", new { area = "" }, new { @class = "nav-link text-white menu-bar" })
+                        </li>
+                        <li class="btn btn-dark mx-1 py-0">
+                            @Html.ActionLink("Informacje", "Info", "Home", new { area = "" }, new { @class = "nav-link text-white menu-bar" })
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    }
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Wysyłanie e-maili</p>
+        </footer>
+    </div>
+
+    <div class="privacy-policy-info" style="display: none;">
+        <span class="cookie-icon">🍪</span>
+        Korzystając ze strony wyrażasz zgodę na wykorzystanie przez serwis plików cookies.
+        <a href="/Home/Info">Dowiedz się więcej</a>
+        <button onclick="closePrivacyPolicy()" type="button" class="btn btn-light btn-sm mx-3 my-1 privacy-policy-btn">Ok, rozumiem</button>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
+<script>
+    const closePrivacyPolicy = () => {
+        $('.privacy-policy-info').css("display", "none");
+        $.cookie("privacyPolicy", "1", { path: '/', expires: 365 });
+    }
+
+    $(document).ready(() => {
+        if ($.cookie("privacyPolicy") !== "1")
+            $('.privacy-policy-info').css("display", "");
+    });
+</script>

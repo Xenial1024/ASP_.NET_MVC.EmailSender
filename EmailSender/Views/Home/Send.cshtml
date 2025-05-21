@@ -1,0 +1,221 @@
+﻿<h1 id="title">Wysyłanie e-maila</h1>
+<hr />
+@model EmailSender.Models.Domains.EmailParams
+@{
+    ViewBag.Title = "Wysyłanie e-maila";
+}
+@using (Html.BeginForm("Send", "Home", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <div class="form-group">
+        @Html.LabelFor(m => m.Receivers, new { @class = "control-label label-font-size" })
+        @Html.TextBoxFor(m => m.Receivers, new { @class = "form-control dark-input", placeholder = "Wprowadź adresy e-mail oddzielone przecinkiem." })
+        @Html.ValidationMessageFor(m => m.Receivers)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Subject, new { @class = "control-label label-font-size" })
+        @Html.TextBoxFor(m => m.Subject, new { @class = "form-control dark-input" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Body, new { @class = "control-label label-font-size" })
+        @Html.TextAreaFor(m => m.Body, new { @class = "form-control dark-input", rows = 14 })
+        @Html.ValidationMessageFor(m => m.Body)
+    </div>
+    <div class="form-group">
+        <label>Załącznik</label>
+        @if (Model.Attachment != null && !string.IsNullOrEmpty(Model.Attachment.FileName))
+        {
+            <div class="selected-files mt-2" id="file-list">
+                <div class="file-item d-flex justify-content-between align-items-center">
+                    <div class="file-item__info">
+                        <div class="file-item__icon">
+                            <i class="fas fa-file"></i>
+                        </div>
+                        <div class="file-item__name">@Model.Attachment.FileName</div>
+                    </div>
+                    <button type="submit" name="removeAttachment" value="true" class="btn btn-danger btn-sm ml-3">
+                        <i class="fas fa-times"></i> Usuń
+                    </button>
+                </div>
+            </div>
+            <input type="hidden" name="attachmentFileName" value="@Model.Attachment.FileName" />
+        }
+        else
+        {
+            <div class="custom-file-container" id="drop-area">
+                <div class="drop-zone">
+                    <span class="drop-zone__prompt">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Przeciągnij tu załącznik lub kliknij, aby go dodać.
+                        <br><small>(Maksymalny rozmiar: 4 MB)</small>
+                    </span>
+                    <input type="file" name="attachments" id="fileUpload" class="drop-zone__input">
+                </div>
+                <div class="selected-files mt-2" id="file-list"></div>
+            </div>
+        }
+    </div>
+    @Html.HiddenFor(m => m.SendingTime)
+    @Html.HiddenFor(m => m.IsDelivered)
+
+    if (ViewBag.MessageIndex != null)
+    {
+        <input type="hidden" name="messageIndex" value="@ViewBag.MessageIndex" />
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelector('form').action = '@Url.Action("ResendFromArchive", "Home")';
+            });
+        </script>
+    }
+
+    <br />
+    <div class="form-group">
+        <input type="submit" class="btn btn-success btn-lg" value="Wyślij" />
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropZone = document.querySelector('.drop-zone');
+            const fileInput = document.querySelector('.drop-zone__input');
+            const fileList = document.getElementById('file-list');
+            const MAX_FILE_SIZE = 4194304; // 4 MB w bajtach
+
+            if (!dropZone)
+                return;
+
+            function toggleDropZone() {
+                if (fileList.children.length > 0) {
+                    dropZone.style.display = 'none';
+                } else {
+                    dropZone.style.display = 'flex';
+                }
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            function updateFileList(files) {
+                fileList.innerHTML = '';
+
+                Array.from(files).forEach(file => {
+                    if (file.size > MAX_FILE_SIZE) {
+                        alert(`Plik jest zbyt duży. Maksymalny rozmiar to ${formatFileSize(MAX_FILE_SIZE)}.`);
+                        fileInput.value = '';
+                        return;
+                    }
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+
+                    fileItem.innerHTML = `
+                                <div class="file-item__info">
+                                    <div class="file-item__name">${file.name}</div>
+                                    <div class="file-item__size">${formatFileSize(file.size)}</div>
+                                </div>
+                                <button type="button" class="file-item__remove btn btn-danger btn-sm">
+                                    <i class="fas fa-times"></i> Usuń
+                                </button>
+                            `;
+
+                    const removeButton = fileItem.querySelector('.file-item__remove');
+                    removeButton.addEventListener('click', function () {
+                        fileInput.value = '';
+                        fileItem.remove();
+                        toggleDropZone();
+                    });
+
+                    fileList.appendChild(fileItem);
+                });
+                toggleDropZone();
+            }
+
+            // Dodaj pliki po kliknięciu w obszar
+            dropZone.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // Dodaj pliki po wybraniu z okna dialogowego
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length) {
+                    updateFileList([fileInput.files[0]]);
+                }
+            });
+
+            // Obsługa zdarzeń przeciągania
+            ['dragover', 'dragenter'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('drop-zone--over');
+                });
+            });
+
+            ['dragleave', 'dragend'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.classList.remove('drop-zone--over');
+                });
+            });
+
+            // Obsługa upuszczenia plików
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+
+                    updateFileList([e.dataTransfer.files[0]]);
+                }
+                dropZone.classList.remove('drop-zone--over');
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const receivers = document.getElementById('Receivers');
+            const body = document.getElementById('Body');
+            if (receivers) {
+                receivers.addEventListener('blur', function () {
+                    const input = this.value;
+                    const emails = input.split(',').map(e => e.trim()).filter(e => e.length > 0);
+                    const maxLength = 254;
+
+                    let hasInvalid = false;
+                    for (let email of emails) {
+                        if (email.length > maxLength) {
+                            this.setCustomValidity('Każdy adres e-mail może mieć maksymalnie 254 znaki.');
+                            this.classList.add('input-validation-error');
+                            hasInvalid = true;
+                            break;
+                        }
+                        if (!validator.isEmail(email)) {
+                            this.setCustomValidity('Wszystkie adresy e-mail muszą być poprawne.');
+                            this.classList.add('input-validation-error');
+                            hasInvalid = true;
+                            break;
+                        }
+                    }
+
+                    if (!hasInvalid) {
+                        this.setCustomValidity('');
+                        this.classList.remove('input-validation-error');
+                    }
+                });
+            }
+            if (body) {
+                body.addEventListener('blur', function () {
+                    if (!this.value.trim()) {
+                        this.setCustomValidity('Treść wiadomości nie może być pusta.');
+                        this.classList.add('input-validation-error');
+                    } else {
+                        this.setCustomValidity('');
+                        this.classList.remove('input-validation-error');
+                    }
+                });
+    </script>
+}

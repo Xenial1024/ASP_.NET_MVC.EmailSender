@@ -1,0 +1,73 @@
+﻿@model EmailSender.Models.Domains.EmailParams
+@{
+    ViewBag.Title = "Szczegóły e-maila";
+}
+@{
+    var messageId = ViewBag.MessageIndex ?? Convert.ToInt32(ViewContext.RouteData.Values["id"]);
+}
+
+<h2>Szczegóły wiadomości</h2>
+<hr />
+<div class="panel panel-info">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="dl-horizontal">
+                    <dt>Temat: @Model.Subject</dt>
+                    <dt>Data wysłania: @Model.SendingTime.ToString("dd.MM.yyyy HH:mm:ss")</dt>
+                    <dt>Od: @Model.SenderSettings.SenderName &lt;@Model.SenderSettings.SenderEmail&gt;</dt>
+                    <dt>Do: @Model.Receivers</dt>
+                    <dt>
+                        Status:
+                        @if (Model.IsDelivered)
+                        {
+                            <span class="label label-success">wysłana</span>
+                        }
+                        else
+                        {
+                            <span class="label label-danger" style="color:#f00">niedoręczona</span>
+                        }
+                    </dt>
+                    <dt>
+                        Załącznik:
+                        @if (Model.Attachment != null)
+                        {
+                            <a href="@Url.Action("Download", new { fileName = Model.Attachment.FileName })">
+                                <span class="glyphicon glyphicon-paperclip"></span> @Model.Attachment.FileName
+                            </a>
+                        }
+                        else
+                        {
+                            <span>Brak</span>
+                        }
+                    </dt>
+                </dl>
+            </div>
+        </div>
+        <hr />
+        <p>
+            Treść maila:
+        </p>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="well">
+                    @Html.Raw(Model.Body)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <a href="@Url.Action("Index")" class="btn btn-secondary">
+            <span class="glyphicon glyphicon-arrow-left"></span> Powrót do listy
+        </a>
+        @if (!Model.IsDelivered)
+        {
+            <a href="@Url.Action("ResendEmail", "Archive", new { id = messageId })" class="btn btn-danger">
+                <span class="glyphicon glyphicon-repeat"></span> Ponów wysyłanie
+            </a>
+        }
+    </div>
+</div>

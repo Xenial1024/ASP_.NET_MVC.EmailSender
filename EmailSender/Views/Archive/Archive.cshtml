@@ -1,0 +1,71 @@
+﻿@model List<EmailSender.Models.Domains.EmailParams>
+@{
+    ViewBag.Title = "Archiwum";
+}
+@section Styles {
+    <link href="~/Content/Site.css" rel="stylesheet" />
+}
+
+<h1>Archiwum</h1>
+<hr />
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">Wysłane wiadomości</h3>
+    </div>
+    <div class="panel-body">
+        @if (Model.Count == 0)
+        {
+            <p>Brak wysłanych wiadomości.</p>
+        }
+        else
+        {
+            <table class="table table-hover" style="color: #fff">
+                <thead>
+                    <tr style="background-color: #2c3e50">
+                        <th>Data nadania</th>
+                        <th>Odbiorcy</th>
+                        <th>Temat</th>
+                        <th>Załącznik</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        var email = Model[i];
+                        <tr style="background-color: @(i % 2 == 0 ? "#1a2530" : "#293a4b")">
+                            <td>@email.SendingTime.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@email.Receivers</td>
+                            <td>@email.Subject</td>
+                            <td>
+                                @if (email.Attachment != null)
+                                {
+                                    <a href="@Url.Action("Download", "Archive", new { fileName = email.Attachment.FileName })">
+                                        @email.Attachment.FileName
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>Brak</span>
+                                }
+                            </td>
+                            <td>
+                                <a href="@Url.Action("Details", "Archive", new { id = i })" class="btn btn-info btn-xs">
+                                    <span class="glyphicon glyphicon-info-sign"></span> Szczegóły
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <a href="@Url.Action("Send", "Home")" class="btn btn-primary">
+            <span class="glyphicon glyphicon-envelope"></span> Wyślij nową wiadomość
+        </a>
+    </div>
+</div>
