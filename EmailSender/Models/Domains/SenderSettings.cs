@@ -13,6 +13,7 @@ namespace EmailSender.Models.Domains
 
         [Required(ErrorMessage = "Pole \"E-mail nadawcy\" jest wymagane.")]
         [StringLength(254, ErrorMessage = "Adres email jest zbyt długi.")]
+        [EmailAddress(ErrorMessage = "Adres e-mail nadawcy jest nieprawidłowy.")]
         [Display(Name = "E-mail nadawcy")]
         public string SenderEmail { get; set; }
 

@@ -36,13 +36,6 @@ namespace EmailSender.Controllers
                 return View("Settings", senderSettings);
             }
 
-            if (!HomeController.EmailRegex.IsMatch(senderSettings.SenderEmail))
-            {
-                ModelState.AddModelError("SenderEmail", "Adres email musi być poprawny.");
-                _logger.Error("Adres nie był poprawny.");
-                return View(senderSettings);
-            }
-
             var settings = new
             {
                 senderSettings.SenderEmail,
