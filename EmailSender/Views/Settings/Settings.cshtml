@@ -1,8 +1,8 @@
-﻿<h1 id="title">Ustawienia</h1>
-@model EmailSender.Models.Domains.SenderSettings
+﻿@model EmailSender.Models.Domains.SenderSettings
 @{
     ViewBag.Title = "Ustawienia";
 }
+<h1 id="title">@ViewBag.Title</h1>
 @using (Html.BeginForm("SerializeSettings", "Settings", FormMethod.Post, new { @class = "form-horizontal" }))
 {
     @Html.AntiForgeryToken()

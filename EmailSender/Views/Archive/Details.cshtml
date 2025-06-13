@@ -6,7 +6,7 @@
     var messageId = ViewBag.MessageIndex ?? Convert.ToInt32(ViewContext.RouteData.Values["id"]);
 }
 
-<h2>Szczegóły wiadomości</h2>
+<h2>@ViewBag.Title</h2>
 <hr />
 <div class="panel panel-info">
     <div class="panel-body">

@@ -1,9 +1,9 @@
-﻿<h1 id="title">Wysyłanie e-maila</h1>
-<hr />
+﻿<hr />
 @model EmailSender.Models.Domains.EmailParams
 @{
     ViewBag.Title = "Wysyłanie e-maila";
 }
+<h1 id="title">@ViewBag.Title</h1>
 @using (Html.BeginForm("Send", "Home", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
@@ -115,14 +115,14 @@
                     fileItem.className = 'file-item';
 
                     fileItem.innerHTML = `
-                                <div class="file-item__info">
-                                    <div class="file-item__name">${file.name}</div>
-                                    <div class="file-item__size">${formatFileSize(file.size)}</div>
-                                </div>
-                                <button type="button" class="file-item__remove btn btn-danger btn-sm">
-                                    <i class="fas fa-times"></i> Usuń
-                                </button>
-                            `;
+                                    <div class="file-item__info">
+                                        <div class="file-item__name">${file.name}</div>
+                                        <div class="file-item__size">${formatFileSize(file.size)}</div>
+                                    </div>
+                                    <button type="button" class="file-item__remove btn btn-danger btn-sm">
+                                        <i class="fas fa-times"></i> Usuń
+                                    </button>
+                                `;
 
                     const removeButton = fileItem.querySelector('.file-item__remove');
                     removeButton.addEventListener('click', function () {
