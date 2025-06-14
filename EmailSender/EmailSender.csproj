@@ -138,7 +138,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Domains\Attachment.cs" />
-    <Compile Include="Models\Domains\EmailParams.cs" />
+    <Compile Include="Models\EmailParams.cs" />
     <Compile Include="Models\Domains\SenderSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
